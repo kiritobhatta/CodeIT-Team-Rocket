@@ -14,7 +14,8 @@ def evaluate_inventory():
     logging.info("data sent for evaluation {}".format(data))
     final = []
     for test_case in data:
-        final.append({'searchItemName': test_case["searchItemName"], 'searchResult': Management(test_case["searchItemName"], test_case["items"])})
+        result = Management(test_case["searchItemName"], test_case["items"])
+        final.append({'searchItemName': test_case["searchItemName"], 'searchResult': result})
     return jsonify(final)
 
 
