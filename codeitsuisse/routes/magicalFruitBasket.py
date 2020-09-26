@@ -17,7 +17,7 @@ def evaluateFruitbasket():
     # print("keys:",data.keys)
     weight1 = 11
     weight2 = 27
-    weight3 = 30
+    weight3 = 32
 
     listNo = []
     for key in data.keys():
