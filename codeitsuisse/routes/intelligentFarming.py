@@ -12,78 +12,56 @@ logger = logging.getLogger(__name__)
 def evaluate_gmo():
     data = request.get_json()
     logging.info("data sent for evaluation {}".format(data))
-    
-    id = data['runId']
-    sequences = data['list']
-    output = {}
-    output['runId'] = id
-    output['list'] = []
-    for sequence in sequences:
-        seq_id = sequence['id']
-        gene_seq = sequence['geneSequence']
-        gene_result = {}
-        gene_result['id'] = seq_id
+    runId = data.get("runId")
+    lst = data.get("list")
+    ans = []
 
-        gene_len = len(gene_seq)
-        a_count = 0
-        c_count = 0
-        g_count = 0
-        t_count = 0
-        for char in gene_seq:
-            if char == 'A':
-                a_count += 1
-            elif char == 'C':
-                c_count += 1
-            elif char == 'G':
-                g_count += 1
-            elif char == 'T':
-                t_count += 1
-        
-        num_cc = 0
-        num_acgt = min(a_count, c_count, g_count, t_count)
-        if num_acgt % 2 != 0 and c_count % 2 == 0:
-            num_acgt -= 1
-        num_cc = math.floor((c_count-num_acgt)/2)     
-
-        new_seq = ''
-        a_inserted = False
-        while len(new_seq) < gene_len:
-            if a_inserted == False:
-                if a_count >= 2:
-                    if num_acgt > 0:
-                        new_seq += 'A'
-                        a_count -= 1
-                    else:
-                        new_seq += 'AA'
-                        a_count -= 2
-                elif a_count == 1:
-                    new_seq += 'A'
-                    a_count -= 1
-                a_inserted = True
+    for el in lst:
+        seq = el["geneSequence"]
+        charCount = {"A":0,"C":0,"G":0,"T":0}
+        for char in seq:
+            charCount[char] += 1
+        sorted_seq = []
+        cc_count = 0
+        acgt_count = 0
+        while charCount["A"] > 0 and charCount["C"] > 0 and charCount["G"] > 0 and charCount["T"] > 0:
+            sorted_seq.append("ACGT")
+            charCount["A"] -= 1
+            charCount["C"] -= 1
+            charCount["G"] -= 1
+            charCount["T"] -= 1
+            acgt_count += 1
+        while charCount["C"] > 1:
+            sorted_seq.append("CC")
+            charCount["C"] -= 2
+            cc_count += 1
+        for k,v in charCount.items():
+            if k != "A":
+                for i in range(v):
+                    sorted_seq.append(k)
+        for count in range(acgt_count):
+            if charCount["A"] > 0:
+                sorted_seq.insert(cc_count*2 + count*2, "A")
+                charCount["A"] -= 1
+        for count in range(cc_count):
+            if charCount["A"] > 1:
+                sorted_seq.insert(count*2, "AA")
+                charCount["A"] -= 2
+            elif charCount["A"] == 1:
+                sorted_seq.insert(count*2, "AA")
+                charCount["A"] -= 1
+        count = 0
+        while charCount["A"] > 0:
+            if charCount["A"] == 1:
+                sorted_seq.insert(cc_count*2 + acgt_count*2 + count*2, "A")
+                charCount["A"] -= 1
             else:
-                if num_acgt > 0:
-                    new_seq += 'CGT'
-                    c_count -= 1
-                    g_count -= 1
-                    t_count -= 1
-                    num_acgt -= 1
-                elif num_cc > 0:
-                    new_seq += 'CC'
-                    num_cc -= 1
-                    c_count -= 2
-                elif c_count > 0:
-                    new_seq += 'C'
-                    c_count -=1
-                elif g_count > 0:
-                    new_seq += 'G'
-                    g_count -=1
-                elif t_count > 0:
-                    new_seq += 'T'
-                    t_count -=1
+                sorted_seq.insert(cc_count*2 + acgt_count*2 + count*2, "AA")
+                charCount["A"] -= 2
+            count += 1
 
-                a_inserted = False  
+        ans.append({"id":el["id"], "geneSequence":"".join(sorted_seq)})    
 
-        gene_result['geneSequence'] = new_seq
-        output['list'].append(gene_result)
-    logging.info("My result :{}".format(output))
-    return jsonify(output)
+    result = {"runId":runId, "list":ans}
+    logging.info("My result :{}".format(result))
+    return jsonify(result)
