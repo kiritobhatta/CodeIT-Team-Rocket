@@ -12,6 +12,7 @@ def slsmsolution(boardSize,players,jumps):
     G = {i:{} for i in range(1,boardSize+1)}
     laddersnake = {}
     isjumppoint = [0 for i in range(boardSize+5)]
+    issnake =  [0 for i in range(boardSize+5)]
 
     for jp in jumps:
         s, e = jp.split(':')
@@ -28,6 +29,7 @@ def slsmsolution(boardSize,players,jumps):
             G[s][e] = 0
             laddersnake[s] = e
             isjumppoint[s] = 1
+            issnake[s] = 1
 
     for i in range(1, boardSize):
         if(isjumppoint[i]):
@@ -64,6 +66,7 @@ def slsmsolution(boardSize,players,jumps):
 
     ans = []
     path = [boardSize]
+    shortpath = []
     now = boardSize
     while True:
         pre = previous[now]
@@ -71,29 +74,51 @@ def slsmsolution(boardSize,players,jumps):
             break
         if(laddersnake.get(pre,0)!=now):
             ans.append(abs(now-pre))
+            shortpath.append(now)
         now = pre
         path.append(now)
 
-    print(path)
 
     tem = []
-    if(ans[0] == 1):
-        ans[1] -= 1
+    check0 = 0
+    sema = 0
+    tema = 0
+    if(ans[0] <= 3):
+        ans[0]*=2
+        sema = 1
     else:
         ans[0] -= 1
+        if(isjumppoint[shortpath[0]-1] and not issnake[shortpath[0]-1]):
+            check0 = 1
 
-    for x in ans[::-1]:
+    ans = ans[::-1]
+    
+    for i in range(len(ans)-1):
+        x = ans[i]
         for y in range(players):
             tem.append(x)
 
-    tem[-1] += 1
+    x = ans[-1]
+    if(check0):
+        for y in range(players-1):
+            tem.append(x)
+            tem.append(1)
+        tem.append(x)
+    else:
+        for y in range(players):
+            tem.append(x)
+
+    if(sema):        
+        tem[-1]//=2
+    else:
+        tem[-1]+=1
 
     return tem
 
 @app.route('/slsm', methods=['POST'])
 def evaluate_slsm():
     data = request.get_json();
-    logging.info("data sent for evaluation {}".format(data))
+    logging.info("data sent for evaluation   {}".format(data))
     boardSize = data.get("boardSize")
     players = data.get("players")
     jumps = data.get("jumps")
