@@ -13,7 +13,8 @@ def evaluate_inventory():
     data = request.get_json()
     logging.info("data sent for evaluation {}".format(data))
     result = Management(data[0]["searchItemName"], data[0]["items"])
-    return json.dumps({'searchItemName': data[0]["searchItemName"], 'searchResult': result})
+    dict_value = {'searchItemName': data[0]["searchItemName"], 'searchResult': result}
+    return json.dumps([dict_value])
 
 
 def Management(name, list_array):
