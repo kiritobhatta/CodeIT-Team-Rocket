@@ -41,15 +41,16 @@ def Management(name, list_array):
                     array_char_index += 1
                 else:
                     
-                    if name_char_index+1 < len(name) and array_char_index+1 < len(word) and str(name[name_char_index+1]).lower() == str(word[array_char_index+1]).lower():
-                        new_word += word[array_char_index]
-                        array_char_index += 1
-                        num += 1
-                    elif array_char_index+1 < len(word) and str(name[name_char_index]).lower() == str(word[array_char_index+1]).lower():
+                    # if name_char_index+1 < len(name) and array_char_index+1 < len(word) and str(name[name_char_index+1]).lower() == str(word[array_char_index+1]).lower():
+                    #     new_word += word[array_char_index]
+                    #     array_char_index += 1
+                    #     num += 1
+                    # el
+                    if array_char_index+1 < len(word) and str(name[name_char_index]).lower() == str(word[array_char_index+1]).lower():
                         if word[array_char_index+1] != " ":
                             new_word += "+" + word[array_char_index]
                             num += 1
-                        array_char_index += 1
+                            array_char_index += 1
                     else:
                         new_word += "-" + name[name_char_index]
                         num += 1
