@@ -8,28 +8,17 @@ from codeitsuisse import app;
 logger = logging.getLogger(__name__)
 
 @app.route('/clean_floor', methods=['POST'])
-def evaluateCleanFloor():
-    data = request.get_json()
+def evaluate_clean_floor():
+    data = request.get_json();
     logging.info("data sent for evaluation {}".format(data))
-    tests = data.get("tests")
-    final = {}
+    tests = data.get("tests");
+    ans = {}
+    for key in tests:
+        ans[key] = clean_floor1(tests[key]['floor'])
 
-    for testNum in tests:
-        moves = cleanFloor(testNum, tests[testNum]["floor"])
-        final[testNum] = moves
+    logging.info("My result :{}".format(ans))
+    return json.dumps({"answers": ans})
 
-    result = {}
-    result["answers"] = final
-
-    logging.info("My result :{}".format(result))
-    # return json.dumps(result)
-    return jsonify(result)
-
-def changeDirt(num):
-    if num > 0:
-        num -= 1
-        return num
-    return num+1
 
 def update_array(array, start, end, flag):
     for count in range(end - start):
@@ -42,33 +31,7 @@ def update_array(array, start, end, flag):
         else:
             array[index] += 1
     return array
-
-def cleanFloor(testNum, lst): 
-    moves = 0
-    cleaned_floor = [0 for pos in lst]
-    states = [(0, lst)]
-
-    while states:
-        current_state = states.pop(0)
-        floorRight = current_state[1]
-
-        if floorRight == cleaned_floor:
-            break
-
-        floorLeft = floorRight[:]
-        idx = current_state[0]
-
-        if idx < len(lst) - 1:
-            floorRight[idx + 1] = changeDirt(floorRight[idx + 1])
-            states.append(tuple((idx + 1, floorRight)))
-        
-        if idx > 0:
-            floorLeft[idx - 1] = changeDirt(floorLeft[idx - 1])
-            states.append(tuple((idx - 1, floorLeft)))
-
-        moves += 1
-
-    return moves
+    
     
 def clean_floor1(list_array):
     start_index = 0
