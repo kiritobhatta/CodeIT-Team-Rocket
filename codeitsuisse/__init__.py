@@ -11,3 +11,4 @@ import codeitsuisse.routes.intelligentFarming
 import codeitsuisse.routes.olympiadBabylon
 import codeitsuisse.routes.snakeLadders
 import codeitsuisse.routes.yinYang
+import codeitsuisse.routes.boredScribe
