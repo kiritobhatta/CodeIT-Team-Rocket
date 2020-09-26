@@ -9,13 +9,15 @@ logger = logging.getLogger(__name__)
 
 @app.route('/clean_floor', methods=['POST'])
 def evaluate_clean_floor():
-    data = request.get_json()
+    data = request.get_json();
     logging.info("data sent for evaluation {}".format(data))
-    final = {}
-    final["answers"] = {}
-    for count in range(len(data["tests"])):
-        final["answers"][str(count)] = clean_floor(data["tests"][str(count)]["floor"])
-    return jsonify(final)
+    tests = data.get("tests");
+    ans = {}
+    for key in tests:
+        ans[key] = clean_floor(tests[key]['floor'])
+
+    logging.info("My result :{}".format(ans))
+    return json.dumps({"answers": ans});
 
 
 def clean_floor(list_array):
