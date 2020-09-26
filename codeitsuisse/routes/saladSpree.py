@@ -16,6 +16,9 @@ def evaluate_salad():
 
     return json.dumps({'result': int(result)})
 
+
+
+
 def salad_spree(num, list_array):
     index = 0
     min_value = 0
