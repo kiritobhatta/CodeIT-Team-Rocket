@@ -7,102 +7,50 @@ from codeitsuisse import app;
 
 logger = logging.getLogger(__name__)
 
+def slsm(boardSize, player, jumps):
+    board = [i for i in range(boardSize + 1)]
+    ans = []
+
+    for jump in jumps:
+        temp = jump.split(":")
+        if int(temp[0]) == 0:
+            board[int(temp[1])] = min(int(temp[1]) + 6, boardSize)
+        elif int(temp[1]) == 0:
+            board[int(temp[0])] = max(int(temp[0]) - 6, 0)
+        elif int(temp[0]) > int(temp[1]):
+            board[int(temp[1])] = int(temp[0])
+        elif int(temp[0]) < int(temp[1]):
+            board[int(temp[1])] = int(temp[1])
+
+    print(board[290:])
+    x = 0
+    y = 0
+    shortest_path = []
+
+    while x != boardSize:
+        next_6 = board[x + 1:x + 6 + 1]
+
+        next_6_l = board[y + 1:y + 6 + 1]
+        best_choice_l = next_6_l.index(min(next_6_l)) + 1
+        for _ in range(player - 1):
+            shortest_path.append(best_choice_l)
+        y = min(next_6_l)
+
+        best_choice = next_6.index(max(next_6)) + 1
+        shortest_path.append(best_choice)
+        x = max(next_6)
+        ans.append(x)
+    print(ans)
+    return shortest_path
+
 @app.route('/slsm', methods=['POST'])
 def evaluate_slsm():
     data = request.get_json()
     logging.info("data sent for evaluation {}".format(data))
+    boardSize = data.get("boardSize")
+    players = data.get("players")
+    jumps = data.get("jumps")
+    result = slsm(boardSize, players, jumps)
+    logging.info("My result :{}".format(result))
+    return jsonify(result)
 
-    boardSize = data['boardSize']
-    players = data['players']
-    jumps = data['jumps']
-
-    snakes = {}
-    ladders = {}
-    smokes = set()
-    mirrors= set()
-    for jump in jumps:
-        jump = jump.split(':')
-        if jump[1] == '0':
-            smokes.add(int(jump[0]))
-        if jump[0] == '0':
-            mirrors.add(int(jump[1]))
-        if int(jump[0]) > int(jump[1]):
-            snakes[int(jump[0])] = int(jump[1])
-        if int(jump[0]) < int(jump[1]):
-            ladders[int(jump[0])] = int(jump[1])
-
-    ## all start at 0
-    player_pos = [1] * players
-    last = players-1
-    dice_rolls = []
-
-    def go_next(cur_pos, smoky):
-        best_roll = 0
-        mirror = False
-        smoke = False
-        best_pos = 0
-        for i in range(1,7):
-            if smoky:
-                i = -i
-            new_pos = cur_pos + i
-            if new_pos == boardSize:
-                best_pos = boardSize
-                best_roll = i
-                mirror = False
-                smoke = False
-                break
-            elif new_pos in ladders.keys():
-                new_pos = ladders[new_pos]
-                if new_pos > best_pos:
-                    best_pos = new_pos
-                    best_roll = i
-                    mirror = False
-                    smoke = False
-            elif new_pos in mirrors:
-                mirror = True
-                if new_pos > best_pos:
-                    best_pos = new_pos
-                    best_roll = i
-                    smoke = False
-            elif new_pos not in set(snakes.keys()).union(smokes):
-                if new_pos > best_pos:
-                    best_pos = new_pos
-                    best_roll = i
-                    mirror = False
-                    smoke = False
-            elif new_pos in smokes:
-                smoke = True
-                if new_pos > best_pos:
-                    best_pos = new_pos
-                    best_roll = i
-                    mirror = False
-            elif new_pos in snakes.keys():
-                new_pos = snakes[new_pos]
-                if new_pos > best_pos:
-                    best_pos = new_pos
-                    best_roll = i
-                    mirror = False
-                    smoke = False
-        if smoky:
-            best_roll = -best_roll
-        return best_pos, best_roll, mirror, smoke
-        
-    while player_pos[last] < boardSize:
-        dice_rolls += [1] * (last)
-        best_pos, best_roll, mirror, smoke = go_next(player_pos[last], False)
-        player_pos[last] = best_pos
-        print(player_pos[last])
-        dice_rolls.append(best_roll)
-        while mirror or smoke:
-            if mirror:
-                best_pos, best_roll, mirror, smoke = go_next(player_pos[last], False)
-                player_pos[last] = best_pos
-                dice_rolls.append(best_roll)
-            if smoke:
-                player_pos[last] = best_pos
-                dice_rolls.append(best_roll)
-                best_pos, best_roll, mirror, smoke = go_next(player_pos[last], True)
-            print(player_pos[last])
-            
-    logging.info("My result :{}".format(dice_rolls))
-    return json.dumps(dice_rolls)
