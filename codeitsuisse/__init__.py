@@ -6,4 +6,5 @@ import codeitsuisse.routes.inventoryManagement
 import codeitsuisse.routes.clean_floor
 import codeitsuisse.routes.optimizedportfolio
 import codeitsuisse.routes.socialDistancing
+import codeitsuisse.routes.magicalFruitBasket
 
