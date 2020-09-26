@@ -38,7 +38,7 @@ def findExpected(num_values, num_operations, values):
             
             poss[numOps] += 1
             total[numOps] += 1
-            (cond, pos) = compare(i,bitmask,values)
+            (cond, pos) = compare(i, bitmask, values)
             
             if cond:
                 q.put((bitmask & ~(1<<pos), fr[1] + 1))
@@ -66,4 +66,4 @@ def evaluate_yinYang():
     elements = data.get("elements")
     result = findExpected(number_of_elements, number_of_operations, elements) 
     logging.info("My result :{}".format(result))
-    return jsonify('{:.{prec}f}'.format(result, prec=10))
+    return f"{result:.{10}f}"

@@ -45,7 +45,8 @@ def evaluateBabylon():
     logging.info("data sent for evaluation {}".format(data))
     no_books = data.get("numberOfBooks")
     no_days = data.get("numberOfDays")
-
+    # ori_books = data.get("books")
+    # days = data.get("days")
 
     books_left = sorted(data.get("books"))
     days = sorted(data.get("days"), reverse=True)
