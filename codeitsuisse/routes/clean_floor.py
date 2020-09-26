@@ -52,7 +52,7 @@ def clean_floor1(list_array):
         if list_array[start_index] % 2 == 1:
             moves += list_array[start_index] * 2 + 1
         else:
-            moves += (list_array[start_index]) * 2 + 1
+            moves += (list_array[start_index]) * 2
     return moves
 
 
