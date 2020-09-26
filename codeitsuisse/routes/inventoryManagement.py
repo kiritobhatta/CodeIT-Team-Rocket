@@ -12,9 +12,12 @@ logger = logging.getLogger(__name__)
 def evaluate_inventory():
     data = request.get_json()
     logging.info("data sent for evaluation {}".format(data))
-    result = Management(data[0]["searchItemName"], data[0]["items"])
-    dict_value = {'searchItemName': data[0]["searchItemName"], 'searchResult': result}
-    return json.dumps([dict_value])
+    final = []
+    for test_case in data:
+        result = Management(test_case["searchItemName"], test_case["items"])
+        dict_value = {'searchItemName': data[0]["searchItemName"], 'searchResult': result}
+        final.append(dict_value)
+    return json.dumps(final)
 
 
 def Management(name, list_array):
