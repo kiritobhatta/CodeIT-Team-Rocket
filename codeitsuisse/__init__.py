@@ -9,3 +9,4 @@ import codeitsuisse.routes.socialDistancing
 import codeitsuisse.routes.magicalFruitBasket
 import codeitsuisse.routes.intelligentFarming
 import codeitsuisse.routes.olympiadBabylon
+import codeitsuisse.routes.snakeLadders
