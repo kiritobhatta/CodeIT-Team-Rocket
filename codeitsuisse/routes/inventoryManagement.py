@@ -4,6 +4,7 @@ import json
 from flask import request, jsonify;
 
 from codeitsuisse import app;
+from itertools import islice
 
 logger = logging.getLogger(__name__)
 
@@ -11,14 +12,14 @@ logger = logging.getLogger(__name__)
 def evaluate_inventory():
     data = request.get_json()
     logging.info("data sent for evaluation {}".format(data))
-    result = Management(data.get("searchItemName"), data.get("items"))
-    logging.info("result : {}".format(result))
-    return json.dumps({'searchItemName': data.get("searchItemName"), 'searchResult': result})
+    result = Management(data[0]["searchItemName"], data[0]["items"])
+    return json.dumps({'searchItemName': data[0]["searchItemName"], 'searchResult': result})
 
 
 def Management(name, list_array):
     ordered_dict = {}
-    for word in list_array:
+    sorted_list = sorted(list_array, key=str.lower)
+    for word in sorted_list:
         new_word = ""
         array_char_index = 0
         num = 0
@@ -59,4 +60,4 @@ def Management(name, list_array):
                 num += 1
         ordered_dict[new_word] = num
     ordered_dict.keys()
-    return unordered_dict
+    return list(islice(ordered_dict, 10))
