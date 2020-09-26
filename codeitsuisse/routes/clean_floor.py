@@ -19,7 +19,6 @@ def clean():
     logging.info("My result :{}".format(ans))
     return json.dumps({"answers": ans});
 
-
 def clean_floor(a):
     # a is an array of digits e.g., [0,1,1,1]
     i = 0
@@ -40,10 +39,14 @@ def clean_floor(a):
                 a[i] -= 1
         else:
             num_moves += 1
-            i -= 1
+            if i==0:
+                i+= 1
+            else:
+                i -= 1
             if a[i] == 0:
                 a[i] += 1
             else:
                 a[i] -= 1
 
     return num_moves
+
