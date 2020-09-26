@@ -49,12 +49,10 @@ def clean_floor1(list_array):
         flag = not flag
             
     if list_array[start_index] != 0:
-        print("fuck")
-        if list_array[start_index] % 2 == 0:
+        if list_array[start_index] % 2 == 1:
             moves += list_array[start_index] * 2 + 1
         else:
-            moves += (list_array[start_index]+1) * 2
-                
+            moves += (list_array[start_index]) * 2 + 1
     return moves
 
 
