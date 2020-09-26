@@ -10,7 +10,9 @@ logger = logging.getLogger(__name__)
 
 @app.route('/fruitbasket', methods=['POST'])
 def evaluateFruitbasket():
-    data = request.get_json()
+    dataByteString = request.get_data()
+    dataString = dataByteString.decode('utf-8')
+    data = json.loads(dataString)
     logging.info("data sent for evaluation {}".format(data))
 
     appleAmount = data.get("maApple")
