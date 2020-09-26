@@ -1,5 +1,6 @@
 import logging
 import json
+import heapq
 
 from flask import request, jsonify;
 
@@ -7,50 +8,96 @@ from codeitsuisse import app;
 
 logger = logging.getLogger(__name__)
 
-def slsm(boardSize, player, jumps):
-    board = [i for i in range(boardSize + 1)]
+def slsmsolution(boardSize,players,jumps):
+    G = {i:{} for i in range(1,boardSize+1)}
+    laddersnake = {}
+    isjumppoint = [0 for i in range(boardSize+5)]
+
+    for jp in jumps:
+        s, e = jp.split(':')
+        s, e = int(s), int(e)
+        if(s == 0):
+            for i in range(1,7):
+                G[e][s+i] = 0
+            isjumppoint[e] = 1
+        elif(e == 0):
+            for i in range(1,7):
+                G[s][s-i] = 0
+            isjumppoint[s] = 1
+        else:
+            G[s][e] = 0
+            laddersnake[s] = e
+            isjumppoint[s] = 1
+
+    for i in range(1, boardSize):
+        if(isjumppoint[i]):
+            continue
+        for j in range(1,7):
+            if(i+j > boardSize):
+                break
+            G[i][i+j] = 1
+
+
+
+    def calculate_distances(graph, starting_vertex):
+        distances = {vertex: float('infinity') for vertex in graph}
+        distances[starting_vertex] = 0
+        previous = {vertex: -1 for vertex in graph}
+
+        pq = [(0, starting_vertex)]
+        while len(pq) > 0:
+            current_distance, current_vertex = heapq.heappop(pq)
+            if current_distance > distances[current_vertex]:
+                continue
+
+            for neighbor, weight in graph[current_vertex].items():
+                distance = current_distance + weight
+                if distance < distances[neighbor]:
+                    distances[neighbor] = distance
+                    previous[neighbor] = current_vertex
+                    heapq.heappush(pq, (distance, neighbor))
+
+        return distances, previous
+
+
+    distances, previous = calculate_distances(G, 1)
+
     ans = []
+    path = [boardSize]
+    now = boardSize
+    while True:
+        pre = previous[now]
+        if(pre==-1):
+            break
+        if(laddersnake.get(pre,0)!=now):
+            ans.append(abs(now-pre))
+        now = pre
+        path.append(now)
 
-    for jump in jumps:
-        temp = jump.split(":")
-        if int(temp[0]) == 0:
-            board[int(temp[1])] = min(int(temp[1]) + 6, boardSize)
-        elif int(temp[1]) == 0:
-            board[int(temp[0])] = max(int(temp[0]) - 6, 0)
-        elif int(temp[0]) > int(temp[1]):
-            board[int(temp[1])] = int(temp[0])
-        elif int(temp[0]) < int(temp[1]):
-            board[int(temp[1])] = int(temp[1])
+    print(path)
 
-    print(board[290:])
-    x = 0
-    y = 0
-    shortest_path = []
+    tem = []
+    if(ans[0] == 1):
+        ans[1] -= 1
+    else:
+        ans[0] -= 1
 
-    while x != boardSize:
-        next_6 = board[x + 1:x + 6 + 1]
+    for x in ans[::-1]:
+        for y in range(players):
+            tem.append(x)
 
-        next_6_l = board[y + 1:y + 6 + 1]
-        best_choice_l = next_6_l.index(min(next_6_l)) + 1
-        for _ in range(player - 1):
-            shortest_path.append(best_choice_l)
-        y = min(next_6_l)
+    tem[-1] += 1
 
-        best_choice = next_6.index(max(next_6)) + 1
-        shortest_path.append(best_choice)
-        x = max(next_6)
-        ans.append(x)
-    print(ans)
-    return shortest_path
+    return tem
 
 @app.route('/slsm', methods=['POST'])
 def evaluate_slsm():
-    data = request.get_json()
+    data = request.get_json();
     logging.info("data sent for evaluation {}".format(data))
     boardSize = data.get("boardSize")
     players = data.get("players")
     jumps = data.get("jumps")
-    result = slsm(boardSize, players, jumps)
+    result = slsmsolution(boardSize,players,jumps)
     logging.info("My result :{}".format(result))
-    return jsonify(result)
+    return json.dumps(result)
 
