@@ -10,17 +10,20 @@ logger = logging.getLogger(__name__)
 
 @app.route('/optimizedportfolio', methods=['POST'])
 def evaluate_portfolio():
-    data = request.get_json();
+    data = request.get_json()
     logging.info("data sent for evaluation {}".format(data))
     inputs = data.get('inputs')
     ans = []
+    print(type(inputs))
     for inp in inputs:
+        print("Hello")
         port = inp['Portfolio']
         indf= inp['IndexFutures']
         ans.append(opt_portfolio(port, indf))
 
     logging.info("My result :{}".format(ans))
-    return json.dumps({"outputs": ans});
+    return json.dumps({"outputs": ans})
+
 
 def opt_portfolio(portfolio, index_futures):
     if_vol = np.array([ind['FuturePrcVol'] for ind in index_futures])
