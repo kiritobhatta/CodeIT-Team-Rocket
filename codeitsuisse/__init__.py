@@ -12,3 +12,4 @@ import codeitsuisse.routes.olympiadBabylon
 import codeitsuisse.routes.snakeLadders
 import codeitsuisse.routes.yinYang
 import codeitsuisse.routes.boredScribe
+import codeitsuisse.routes.swapHedge
