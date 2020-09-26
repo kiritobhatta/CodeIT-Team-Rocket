@@ -21,7 +21,7 @@ def clean():
 
 
 def clean_floor(a):
-    # a is an array of binary digits e.g., [0,1,1,1]
+    # a is an array of digits e.g., [0,1,1,1]
     i = 0
     n = len(a)
     d = sum(a)
@@ -31,21 +31,19 @@ def clean_floor(a):
         return 0
 
     while sum(a) > 0:
-        if sum(a[i:]) > 0:
-            a[i] = 1-a[i]
-            num_moves += 1
-
-            if sum(a[i+1:])==0:
-                i-=1
+        if sum(a[i+1:]) > 0:
+            num_moves +=1
+            i += 1
+            if a[i] == 0:
+                a[i] += 1
             else:
-                i += 1
-
+                a[i] -= 1
         else:
-            if sum(a[:i]) > 0:
-                a[i] = 1-a[i]
-                num_moves += 1
-                i -= 1
-        if num_moves > 1000:
-            break
+            num_moves += 1
+            i -= 1
+            if a[i] == 0:
+                a[i] += 1
+            else:
+                a[i] -= 1
 
     return num_moves
