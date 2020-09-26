@@ -26,4 +26,4 @@ def evaluateFruitbasket():
     result = appleAmount*appleWeight + watermelonAmount*watermelonWeight + bananaAmount*bananaWeight
 
     logging.info("My result :{}".format(result))
-    return json.dumps(result)
+    return result
