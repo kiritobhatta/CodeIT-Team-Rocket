@@ -32,6 +32,7 @@ def update_array(array, start, end, flag):
             array[index] += 1
     return array
     
+    
 def clean_floor1(list_array):
     start_index = 0
     end_index = len(list_array) - 1
