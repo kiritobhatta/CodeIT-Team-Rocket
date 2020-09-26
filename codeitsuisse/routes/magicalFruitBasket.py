@@ -10,20 +10,21 @@ logger = logging.getLogger(__name__)
 
 @app.route('/fruitbasket', methods=['POST'])
 def evaluateFruitbasket():
-    dataByteString = request.get_data()
-    dataString = dataByteString.decode('utf-8')
-    data = json.loads(dataString)
-    logging.info("data sent for evaluation {}".format(data))
+    data = request.get_data();
+    data = json.loads(data)
+    
+    logging.info("data sent for evaluation2 {}".format(data))
+    # print("keys:",data.keys)
+    weight1 = 10
+    weight2 = 20
+    weight3 = 30
 
-    appleAmount = data.get("maApple")
-    watermelonAmount = data.get("maWatermelon")
-    bananaAmount = data.get("maBanana")
+    listNo = []
+    for key in data.keys():
+        listNo.append(data[key])
 
-    appleWeight = 10
-    watermelonWeight = 20
-    bananaWeight = 30
-
-    result = appleAmount*appleWeight + watermelonAmount*watermelonWeight + bananaAmount*bananaWeight
-
+    result = (weight1*listNo[0]) + weight2*listNo[1] + weight3*listNo[2]
     logging.info("My result :{}".format(result))
-    return str(result)
+    logging.info("List :{}".format(listNo))
+
+    return (str(result));
