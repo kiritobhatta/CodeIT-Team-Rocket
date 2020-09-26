@@ -16,7 +16,7 @@ def evaluateFruitbasket():
     logging.info("data sent for evaluation2 {}".format(data))
     # print("keys:",data.keys)
     weight1 = 11
-    weight2 = 52
+    weight2 = 32
     weight3 = 30
 
     listNo = []
