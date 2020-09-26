@@ -41,7 +41,7 @@ def opt_portfolio(portfolio, index_futures):
         hr = hedge_ratios[idx]
 
     num_futures = hr * portfolio['Value'] /  (index_futures[idx]['IndexFuturePrice'] * index_futures[idx]['Notional'])
-    output = {'Name': index_futures[idx]['Name'],
+    output = {'HedgePositionName': index_futures[idx]['Name'],
              'OptimalHedgeRatio': hr,
              'NumFuturesContract': int(round(num_futures))}
     return output
