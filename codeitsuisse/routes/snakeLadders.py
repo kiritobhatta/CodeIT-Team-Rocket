@@ -8,121 +8,81 @@ from codeitsuisse import app;
 
 logger = logging.getLogger(__name__)
 
-def slsmsolution(boardSize,players,jumps):
-    G = {i:{} for i in range(1,boardSize+1)}
-    laddersnake = {}
-    isjumppoint = [0 for i in range(boardSize+5)]
-    issnake =  [0 for i in range(boardSize+5)]
-
-    for jp in jumps:
-        s, e = jp.split(':')
-        s, e = int(s), int(e)
-        if(s == 0):
-            for i in range(1,7):
-                G[e][s+i] = 0
-            isjumppoint[e] = 1
-        elif(e == 0):
-            for i in range(1,7):
-                G[s][s-i] = 0
-            isjumppoint[s] = 1
-        else:
-            G[s][e] = 0
-            laddersnake[s] = e
-            isjumppoint[s] = 1
-            issnake[s] = 1
-
-    for i in range(1, boardSize):
-        if(isjumppoint[i]):
-            continue
-        for j in range(1,7):
-            if(i+j > boardSize):
-                break
-            G[i][i+j] = 1
-
-
-
-    def calculate_distances(graph, starting_vertex):
-        distances = {vertex: float('infinity') for vertex in graph}
-        distances[starting_vertex] = 0
-        previous = {vertex: -1 for vertex in graph}
-
-        pq = [(0, starting_vertex)]
-        while len(pq) > 0:
-            current_distance, current_vertex = heapq.heappop(pq)
-            if current_distance > distances[current_vertex]:
-                continue
-
-            for neighbor, weight in graph[current_vertex].items():
-                distance = current_distance + weight
-                if distance < distances[neighbor]:
-                    distances[neighbor] = distance
-                    previous[neighbor] = current_vertex
-                    heapq.heappush(pq, (distance, neighbor))
-
-        return distances, previous
-
-
-    distances, previous = calculate_distances(G, 1)
-
+def slsm(boardSize, player, jumps):
+    board = [i for i in range(boardSize + 1)]
     ans = []
-    path = [boardSize]
-    shortpath = []
-    now = boardSize
-    while True:
-        pre = previous[now]
-        if(pre==-1):
-            break
-        if(laddersnake.get(pre,0)!=now):
-            ans.append(abs(now-pre))
-            shortpath.append(now)
-        now = pre
-        path.append(now)
 
+    for jump in jumps:
+        temp = jump.split(":")
+        if int(temp[0]) == 0:
+            board[int(temp[1])] = '+'
+        elif int(temp[1]) == 0:
+            board[int(temp[0])] = '-'
+        elif int(temp[0]) > int(temp[1]):
+            board[int(temp[0])] = int(temp[1])
+        elif int(temp[0]) < int(temp[1]):
+            board[int(temp[0])] = int(temp[1])
+    for a in range(0, boardSize + 1, 10):
+        print(board[a:a + 10])
 
-    tem = []
-    check0 = 0
-    sema = 0
-    tema = 0
-    if(ans[0] <= 3):
-        ans[0]*=2
-        sema = 1
-    else:
-        ans[0] -= 1
-        if(isjumppoint[shortpath[0]-1] and not issnake[shortpath[0]-1]):
-            check0 = 1
+    def findmax(k):
+        from_mirror = False
+        mx = 0
+        mx_ind = -1
+        next6 = board[k + 1:k + 1 + 6]
+        for i, x in enumerate(next6):
+            if x != '+' and x != '-' and x > mx:
+                mx = x
+                mx_ind = i + 1
+                from_mirror = False
+            elif x == '+':
+                print(i + k + 1, board[i + k + 1 + 1:i + k + 1 + 6 + 1])
+                for j, y in enumerate(board[i + k + 1 + 1:i + k + 1 + 6 + 1]):
+                    if y != '+' and y != '-' and y > mx:
+                        mx = y
+                        mx_ind = j + 1
+                        prev_ind = i + 1
+                        from_mirror = True
 
-    ans = ans[::-1]
-    
-    for i in range(len(ans)-1):
-        x = ans[i]
-        for y in range(players):
-            tem.append(x)
+        if from_mirror:
+            return [[prev_ind, mx_ind], mx]
+        else:
+            return [[mx_ind], mx]
 
-    x = ans[-1]
-    if(check0):
-        for y in range(players-1):
-            tem.append(x)
-            tem.append(1)
-        tem.append(x)
-    else:
-        for y in range(players):
-            tem.append(x)
+    def findmin(k):
+        mn = 100000
+        mn_ind = 0
+        for i, x in enumerate(board[k + 1:k + 1 + 6]):
+            if x != '+' and x != '-' and x < mn:
+                mn = x
+                mn_ind = i + 1
+        return [[mn_ind], mn]
 
-    if(sema):        
-        tem[-1]//=2
-    else:
-        tem[-1]+=1
+    x = 1
+    y = 1
+    shortest_path = []
 
-    return tem
+    while x != boardSize:
+        best_choice_l = findmin(y)
+        for _ in range(player - 1):
+            shortest_path.extend(best_choice_l[0])
+        y = best_choice_l[1]
+
+        best_choice = findmax(x)
+        shortest_path.extend(best_choice[0])
+        x = best_choice[1]
+        ans.extend(best_choice[0])
+    print(ans)
+    return shortest_path
 
 @app.route('/slsm', methods=['POST'])
-def evaluate_slsm():
-    data = request.get_json();
-    logging.info("data sent for evaluation   {}".format(data))
+def evaluateSlsm():
+    data = request.get_json()
+    logging.info("data sent for evaluation {}".format(data))
     boardSize = data.get("boardSize")
     players = data.get("players")
     jumps = data.get("jumps")
-    result = slsmsolution(boardSize,players,jumps)
+    result = slsm(boardSize, players, jumps)
     logging.info("My result :{}".format(result))
-    return json.dumps(result)
+    return jsonify(result)
 
